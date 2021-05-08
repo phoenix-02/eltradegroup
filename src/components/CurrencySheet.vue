@@ -50,10 +50,10 @@
                   ></v-text-field>
                 </template>
                 <v-date-picker
-                  locale="en-in"
+                  locale="ru-ru"
                   v-model="date"
                   no-title
-                  @input="getCurrency(base_currency)"
+                  @change="getCurrency(base_currency)"
                 ></v-date-picker>
               </v-menu>
             </v-col>
@@ -74,7 +74,7 @@
               sm="5"
               md="5"
               lg="5"
-              v-for="currency in paginated_currency" :key="currency[0].toString()" :value="'tab-'+currency[0]">
+              v-for="currency in changePaginatedData" :key="currency[0].toString()" :value="'tab-'+currency[0]">
               <v-card color="dark">
                 <v-card-title>
                   {{ base_currency_amount }}<span class="text--disabled"> {{ base_currency }}=</span>
@@ -107,7 +107,7 @@ import axios from 'axios'
 export default {
   name: 'CurrencySheet',
   data: () => ({
-    page: Number,
+    page: 1,
     tab: null,
     date: 'latest',
     date_menu: false,
@@ -139,17 +139,13 @@ export default {
           delete this.all_currency[this.base_currency];
           // default tab
           this.tab = 'tab-' + this.base_currency.toString()
-          // need to activate watcher
-          this.page = 1
+
         })
     },
   },
-  watch: {
-    page: function () {
-      // исходя из изменений страницы меняю пагинированные данные
-      if (this.all_currency) {
-        this.paginated_currency = Object.entries(this.all_currency).slice(this.page * this.currency_per_page - this.currency_per_page, this.page * this.currency_per_page)
-      }
+  computed:{
+    changePaginatedData(){
+      return Object.entries(this.all_currency).slice(this.page * this.currency_per_page - this.currency_per_page, this.page * this.currency_per_page)
     }
   },
   beforeMount() {
